@@ -2,61 +2,111 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Калькулятор тормозов УЗ</title>
 
 <style>
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --accent: #38bdf8;
+    --ok: #22c55e;
+    --gap: 14px;
+}
+
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
 }
 
+/* 🔥 МОБИЛЬНАЯ КОНТЕЙНЕРНАЯ ЛОГИКА */
 .container {
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 12px;
-    width: 420px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
-h2 { text-align: center; color: #38bdf8; }
+/* 🔥 КАРТОЧКА */
+.card {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 14px;
+}
 
-label { display: block; margin-top: 10px; }
+/* 🔥 ЗАГОЛОВОК */
+h2 {
+    text-align: center;
+    color: var(--accent);
+    font-size: 20px;
+    margin: 0 0 12px 0;
+}
 
+/* 🔥 ЛЕЙБЛЫ */
+label {
+    display: block;
+    margin-top: var(--gap);
+    font-size: 15px;
+}
+
+/* 🔥 ИНПУТЫ (главная проблема мобильных версий) */
 input {
     width: 100%;
-    padding: 6px;
-    margin-top: 5px;
-    border-radius: 6px;
+    padding: 14px;
+    margin-top: 6px;
+    border-radius: 10px;
     border: none;
+    font-size: 18px; /* важно для мобильной клавиатуры */
+    box-sizing: border-box;
+    background: #0b1220;
+    color: white;
 }
 
+/* 🔥 КНОПКА */
 button {
-    margin-top: 15px;
     width: 100%;
-    padding: 10px;
-    background: #38bdf8;
+    padding: 16px;
+    margin-top: 18px;
+    background: var(--accent);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: bold;
-    cursor: pointer;
+    font-size: 18px;
 }
 
+/* 🔥 ТАБ */
 .result {
-    margin-top: 20px;
+    margin-top: 18px;
+    background: #0b1220;
     padding: 12px;
-    background: #020617;
-    border-radius: 8px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14px;
 }
 
-.highlight { color: #22c55e; }
+/* 🔥 ПЕРЕКЛЮЧАТЕЛЬ */
+.toggle {
+    margin-top: 16px;
+    padding: 12px;
+    background: #0b1220;
+    border-radius: 10px;
+    font-size: 15px;
+}
 
+/* 🔥 ПАССАЖИРСКИЙ БЛОК */
+.hidden { display: none; }
+
+.highlight { color: var(--ok); }
+
+/* 🔥 ТАБЛИЦА */
 table {
     width: 100%;
+    min-width: 340px;
     margin-top: 10px;
     border-collapse: collapse;
     font-size: 13px;
@@ -64,54 +114,65 @@ table {
 
 td, th {
     border: 1px solid #334155;
-    padding: 4px;
+    padding: 8px;
     text-align: center;
 }
 
-.toggle {
-    margin-top: 15px;
-    cursor: pointer;
-    background: #020617;
-    padding: 8px;
-    border-radius: 6px;
-}
+/* 🔥 УБИРАЕМ ДЕСКТОПНЫЕ ОГРАНИЧЕНИЯ */
+@media (max-width: 600px) {
+    body {
+        padding: 0;
+    }
 
-.hidden { display: none; }
+    .container {
+        padding: 10px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
+<div class="card">
+
 <h2>🚆 Калькулятор тормозов</h2>
 
 <label>Вес поезда (т):</label>
-<input type="number" id="weight">
+<input type="number" id="weight" inputmode="numeric" pattern="[0-9]*">
 
 <label>Груженые вагоны:</label>
-<input type="number" id="loaded">
+<input type="number" id="loaded" inputmode="numeric" pattern="[0-9]*">
 
 <label>Порожние вагоны:</label>
-<input type="number" id="empty">
+<input type="number" id="empty" inputmode="numeric" pattern="[0-9]*">
 
 <div class="toggle" onclick="togglePassenger()">
-    ▶ Пассажирские вагоны
+▶ Пассажирские вагоны
 </div>
 
 <div id="passengerBlock" class="hidden">
-    <label>42–48 т:</label>
-    <input type="number" id="p1">
 
-    <label>48–53 т:</label>
-    <input type="number" id="p2">
+<label>42–48 т:</label>
+<input type="number" id="p1" inputmode="numeric" pattern="[0-9]*">
 
-    <label>>53 т:</label>
-    <input type="number" id="p3">
+<label>48–53 т:</label>
+<input type="number" id="p2" inputmode="numeric" pattern="[0-9]*">
+
+<label>>53 т:</label>
+<input type="number" id="p3" inputmode="numeric" pattern="[0-9]*">
+
 </div>
 
 <button onclick="calc()">Рассчитать</button>
 
 <div class="result" id="result"></div>
+
+</div>
 </div>
 
 <script>
@@ -139,16 +200,12 @@ let onlyPassenger = (freight === 0 && passenger > 0);
 let mixed = (freight > 0 && passenger > 0);
 
 // --------------------
-// ВЕС
-// --------------------
 let finalWeight = weight;
 
 if (totalWagons <= 5 || onlyPassenger) {
     finalWeight += 123;
 }
 
-// --------------------
-// ОСИ
 // --------------------
 let axlesLoaded = loaded * 4;
 let axlesEmpty = empty * 4;
@@ -161,46 +218,24 @@ let passengerAxles = axlesP1 + axlesP2 + axlesP3;
 
 let axles = axlesLoaded + axlesEmpty + passengerAxles;
 
-// --------------------
-// ЛОКОМОТИВ
-// --------------------
-let locoAxles = 0;
+let locoAxles = (totalWagons <= 5 || onlyPassenger) ? 6 : 0;
 
-if (totalWagons <= 5 || onlyPassenger) {
-    locoAxles = 6;
-    axles += 6;
-}
+axles += locoAxles;
 
 // --------------------
-// ПОТРЕБНОЕ НАЖАТИЕ
-// --------------------
-let need = 0;
-
-// 🔥 НОВОЕ ПРАВИЛО
-if (onlyPassenger) {
-    need = finalWeight * 0.6;
-}
-else {
-    need = finalWeight * 0.33;
-}
+let need = onlyPassenger ? finalWeight * 0.6 : finalWeight * 0.33;
 
 // --------------------
-// РУЧНЫЕ ОСИ
-// --------------------
-let handAxles = 0;
+let handAxles;
 
 if (mixed) {
     handAxles = finalWeight * 0.006;
-}
-else if (onlyPassenger) {
+} else if (onlyPassenger) {
     handAxles = passengerAxles + 2;
-}
-else {
+} else {
     handAxles = finalWeight * 0.006;
 }
 
-// --------------------
-// НАЖАТИЯ
 // --------------------
 let pressEmpty = axlesEmpty * 3.5;
 let pressLoaded = axlesLoaded * 7;
@@ -215,36 +250,28 @@ let totalPress =
     pressEmpty + pressLoaded + pressP1 + pressP2 + pressP3 + pressLoco;
 
 // --------------------
-// ТАБЛИЦА
-// --------------------
-let rows = "";
-
-if (axlesEmpty) rows += `<tr><td>3.5</td><td>${axlesEmpty}</td><td>${pressEmpty.toFixed(2)}</td></tr>`;
-if (axlesLoaded) rows += `<tr><td>7</td><td>${axlesLoaded}</td><td>${pressLoaded.toFixed(2)}</td></tr>`;
-if (axlesP1) rows += `<tr><td>8</td><td>${axlesP1}</td><td>${pressP1.toFixed(2)}</td></tr>`;
-if (axlesP2) rows += `<tr><td>9</td><td>${axlesP2}</td><td>${pressP2.toFixed(2)}</td></tr>`;
-if (axlesP3) rows += `<tr><td>10</td><td>${axlesP3}</td><td>${pressP3.toFixed(2)}</td></tr>`;
-if (locoAxles) rows += `<tr><td>11</td><td>${locoAxles}</td><td>${pressLoco.toFixed(2)}</td></tr>`;
-
 document.getElementById("result").innerHTML = `
+<b>Вес:</b> ${finalWeight.toFixed(2)} т<br>
 <b>Осей:</b> ${axles}<br>
-<b>Вес:</b> ${finalWeight.toFixed(2)} т<br><br>
-
-<b>Необходимое:</b> <span class="highlight">${need.toFixed(2)}</span><br>
-<b>Потребное:</b> <span class="highlight">${totalPress.toFixed(2)}</span><br>
-<b>Ручные:</b> <span class="highlight">${handAxles.toFixed(2)}</span>
+<b>Потребное:</b> <span class="highlight">${need.toFixed(2)}</span><br>
+<b>Ручные:</b> <span class="highlight">${handAxles.toFixed(2)}</span><br>
+<b>Факт:</b> ${totalPress.toFixed(2)}
 
 <br><br>
-<b>Расчёт потребного нажатия:</b>
 
 <table>
 <tr>
-<th>Коэффициент</th>
-<th>Осей</th>
-<th>Потребное нажатие</th>
+<th>Коэф</th>
+<th>Оси</th>
+<th>Нажатие</th>
 </tr>
 
-${rows}
+${axlesEmpty ? `<tr><td>3.5</td><td>${axlesEmpty}</td><td>${pressEmpty.toFixed(2)}</td></tr>` : ""}
+${axlesLoaded ? `<tr><td>7</td><td>${axlesLoaded}</td><td>${pressLoaded.toFixed(2)}</td></tr>` : ""}
+${axlesP1 ? `<tr><td>8</td><td>${axlesP1}</td><td>${pressP1.toFixed(2)}</td></tr>` : ""}
+${axlesP2 ? `<tr><td>9</td><td>${axlesP2}</td><td>${pressP2.toFixed(2)}</td></tr>` : ""}
+${axlesP3 ? `<tr><td>10</td><td>${axlesP3}</td><td>${pressP3.toFixed(2)}</td></tr>` : ""}
+${locoAxles ? `<tr><td>11</td><td>${locoAxles}</td><td>${pressLoco.toFixed(2)}</td></tr>` : ""}
 
 <tr>
 <th>Всего</th>
@@ -255,6 +282,7 @@ ${rows}
 </table>
 `;
 }
+
 </script>
 
 </body>

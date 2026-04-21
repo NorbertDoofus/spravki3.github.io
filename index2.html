@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Калькулятор тормозов УЗ</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+h2 { text-align: center; color: #38bdf8; }
+
+label { display: block; margin-top: 10px; }
+
+input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 12px;
+    background: #020617;
+    border-radius: 8px;
+}
+
+.highlight { color: #22c55e; }
+
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+td, th {
+    border: 1px solid #334155;
+    padding: 4px;
+    text-align: center;
+}
+
+.toggle {
+    margin-top: 15px;
+    cursor: pointer;
+    background: #020617;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🚆 Калькулятор тормозов</h2>
+
+<label>Вес поезда (т):</label>
+<input type="number" id="weight">
+
+<label>Груженые вагоны:</label>
+<input type="number" id="loaded">
+
+<label>Порожние вагоны:</label>
+<input type="number" id="empty">
+
+<div class="toggle" onclick="togglePassenger()">
+    ▶ Пассажирские вагоны
+</div>
+
+<div id="passengerBlock" class="hidden">
+    <label>42–48 т:</label>
+    <input type="number" id="p1">
+
+    <label>48–53 т:</label>
+    <input type="number" id="p2">
+
+    <label>>53 т:</label>
+    <input type="number" id="p3">
+</div>
+
+<button onclick="calc()">Рассчитать</button>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+
+function togglePassenger() {
+    document.getElementById("passengerBlock").classList.toggle("hidden");
+}
+
+function calc() {
+
+let weight = +document.getElementById("weight").value || 0;
+let loaded = +document.getElementById("loaded").value || 0;
+let empty = +document.getElementById("empty").value || 0;
+
+let p1 = +document.getElementById("p1").value || 0;
+let p2 = +document.getElementById("p2").value || 0;
+let p3 = +document.getElementById("p3").value || 0;
+
+// --------------------
+let freight = loaded + empty;
+let passenger = p1 + p2 + p3;
+let totalWagons = freight + passenger;
+
+let onlyPassenger = (freight === 0 && passenger > 0);
+let mixed = (freight > 0 && passenger > 0);
+
+// --------------------
+// ВЕС
+// --------------------
+let finalWeight = weight;
+
+if (totalWagons <= 5 || onlyPassenger) {
+    finalWeight += 123;
+}
+
+// --------------------
+// ОСИ
+// --------------------
+let axlesLoaded = loaded * 4;
+let axlesEmpty = empty * 4;
+
+let axlesP1 = p1 * 4;
+let axlesP2 = p2 * 4;
+let axlesP3 = p3 * 4;
+
+let passengerAxles = axlesP1 + axlesP2 + axlesP3;
+
+let axles = axlesLoaded + axlesEmpty + passengerAxles;
+
+// --------------------
+// ЛОКОМОТИВ
+// --------------------
+let locoAxles = 0;
+
+if (totalWagons <= 5 || onlyPassenger) {
+    locoAxles = 6;
+    axles += 6;
+}
+
+// --------------------
+// ПОТРЕБНОЕ НАЖАТИЕ
+// --------------------
+let need = 0;
+
+// 🔥 НОВОЕ ПРАВИЛО
+if (onlyPassenger) {
+    need = finalWeight * 0.6;
+}
+else {
+    need = finalWeight * 0.33;
+}
+
+// --------------------
+// РУЧНЫЕ ОСИ
+// --------------------
+let handAxles = 0;
+
+if (mixed) {
+    handAxles = finalWeight * 0.006;
+}
+else if (onlyPassenger) {
+    handAxles = passengerAxles + 2;
+}
+else {
+    handAxles = finalWeight * 0.006;
+}
+
+// --------------------
+// НАЖАТИЯ
+// --------------------
+let pressEmpty = axlesEmpty * 3.5;
+let pressLoaded = axlesLoaded * 7;
+
+let pressP1 = axlesP1 * 8;
+let pressP2 = axlesP2 * 9;
+let pressP3 = axlesP3 * 10;
+
+let pressLoco = locoAxles * 11;
+
+let totalPress =
+    pressEmpty + pressLoaded + pressP1 + pressP2 + pressP3 + pressLoco;
+
+// --------------------
+// ТАБЛИЦА
+// --------------------
+let rows = "";
+
+if (axlesEmpty) rows += `<tr><td>3.5</td><td>${axlesEmpty}</td><td>${pressEmpty.toFixed(2)}</td></tr>`;
+if (axlesLoaded) rows += `<tr><td>7</td><td>${axlesLoaded}</td><td>${pressLoaded.toFixed(2)}</td></tr>`;
+if (axlesP1) rows += `<tr><td>8</td><td>${axlesP1}</td><td>${pressP1.toFixed(2)}</td></tr>`;
+if (axlesP2) rows += `<tr><td>9</td><td>${axlesP2}</td><td>${pressP2.toFixed(2)}</td></tr>`;
+if (axlesP3) rows += `<tr><td>10</td><td>${axlesP3}</td><td>${pressP3.toFixed(2)}</td></tr>`;
+if (locoAxles) rows += `<tr><td>11</td><td>${locoAxles}</td><td>${pressLoco.toFixed(2)}</td></tr>`;
+
+document.getElementById("result").innerHTML = `
+<b>Осей:</b> ${axles}<br>
+<b>Вес:</b> ${finalWeight.toFixed(2)} т<br><br>
+
+<b>Необходимое:</b> <span class="highlight">${need.toFixed(2)}</span><br>
+<b>Потребное:</b> <span class="highlight">${totalPress.toFixed(2)}</span><br>
+<b>Ручные:</b> <span class="highlight">${handAxles.toFixed(2)}</span>
+
+<br><br>
+<b>Расчёт потребного нажатия:</b>
+
+<table>
+<tr>
+<th>Коэффициент</th>
+<th>Осей</th>
+<th>Потребное нажатие</th>
+</tr>
+
+${rows}
+
+<tr>
+<th>Всего</th>
+<th>${axles}</th>
+<th>${totalPress.toFixed(2)}</th>
+</tr>
+
+</table>
+`;
+}
+</script>
+
+</body>
+</html>
